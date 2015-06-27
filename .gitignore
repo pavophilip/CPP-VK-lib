@@ -1,0 +1,5 @@
+vkapp
+doxygen.conf
+doxygen.conf.bak
+main.cpp
+src/jsoncpp
