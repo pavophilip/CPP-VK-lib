@@ -46,6 +46,18 @@ Json::Value VK::API::call(string method, map<string, string> data){
 	return root;
 }
 
+vector<VK::UserFull> VK::API::usersGet(map<string, string> params){
+	vector<VK::UserFull> users;
+	Json::Value resp = this->call("users.get", params);
+	if(resp["success"].asBool() && resp["response"].isArray()){
+		Json::Value response = resp["response"];
+		for(int i = 0; i < response.size(); i++){
+			users.push_back(VK::UserFull::parse(response[i]));
+		}
+	}
+	return users;
+}
+
 string VK::API::post(string url, string data){
 	static char errorBuffer[CURL_ERROR_SIZE];
 	static string buffer;
@@ -205,6 +217,89 @@ VK::UserFull::Seen VK::UserFull::Seen::parse(Json::Value json){
 	seen.platform = json["platform"].asInt();
 	return seen;
 }
+
+// PARAMETERS
+const string VK::Parameters::USER_ID = "user_id";
+const string VK::Parameters::USER_IDS = "user_ids";
+const string VK::Parameters::FIELDS = "fields";
+const string VK::Parameters::SORT = "sort";
+const string VK::Parameters::OFFSET = "offset";
+const string VK::Parameters::COUNT = "count";
+const string VK::Parameters::OWNER_ID = "owner_id";
+
+//auth
+const string VK::Parameters::VERSION = "v";
+const string VK::Parameters::HTTPS = "https";
+const string VK::Parameters::LANG = "lang";
+const string VK::Parameters::ACCESS_TOKEN = "access_token";
+const string VK::Parameters::SIG = "sig";
+
+//get users
+const string VK::Parameters::NAME_CASE = "name_case";
+
+//Get subscriptions
+const string VK::Parameters::EXTENDED = "extended";
+
+//Search
+const string VK::Parameters::Q = "q";
+const string VK::Parameters::CITY = "city";
+const string VK::Parameters::COUNTRY = "country";
+const string VK::Parameters::HOMETOWN = "hometown";
+const string VK::Parameters::UNIVERSITY_COUNTRY = "university_country";
+const string VK::Parameters::UNIVERSITY = "university";
+const string VK::Parameters::UNIVERSITY_YEAR = "university_year";
+const string VK::Parameters::SEX = "sex";
+const string VK::Parameters::STATUS = "status";
+const string VK::Parameters::AGE_FROM = "age_from";
+const string VK::Parameters::AGE_TO = "age_to";
+const string VK::Parameters::BIRTH_DAY = "birth_day";
+const string VK::Parameters::BIRTH_MONTH = "birth_month";
+const string VK::Parameters::BIRTH_YEAR = "birth_year";
+const string VK::Parameters::ONLINE = "online";
+const string VK::Parameters::HAS_PHOTO = "has_photo";
+const string VK::Parameters::SCHOOL_COUNTRY = "school_country";
+const string VK::Parameters::SCHOOL_CITY = "school_city";
+const string VK::Parameters::SCHOOL = "school";
+const string VK::Parameters::SCHOOL_YEAR = "school_year";
+const string VK::Parameters::RELIGION = "religion";
+const string VK::Parameters::INTERESTS = "interests";
+const string VK::Parameters::COMPANY = "company";
+const string VK::Parameters::POSITION = "position";
+const string VK::Parameters::GROUP_ID = "group_id";
+
+const string VK::Parameters::FRIENDS_ONLY = "friends_only";
+const string VK::Parameters::FROM_GROUP = "from_group";
+const string VK::Parameters::MESSAGE = "message";
+const string VK::Parameters::ATTACHMENTS = "attachments";
+const string VK::Parameters::SERVICES = "services";
+const string VK::Parameters::SIGNED = "signed";
+const string VK::Parameters::PUBLISH_DATE = "publish_date";
+const string VK::Parameters::LAT = "lat";
+const string VK::Parameters::LONG = "long";
+const string VK::Parameters::PLACE_ID = "place_id";
+const string VK::Parameters::POST_ID = "post_id";
+
+//Errors
+const string VK::Parameters::ERROR_CODE = "error_code";
+const string VK::Parameters::ERROR_MSG = "error_msg";
+const string VK::Parameters::REQUEST_PARAMS = "request_params";
+
+//Captcha
+const string VK::Parameters::CAPTCHA_IMG = "captcha_img";
+const string VK::Parameters::CAPTCHA_SID = "captcha_sid";
+const string VK::Parameters::CAPTCHA_KEY = "captcha_key";
+const string VK::Parameters::REDIRECT_URI = "redirect_uri";
+
+//Photos
+const string VK::Parameters::PHOTO = "photo";
+const string VK::Parameters::PHOTOS = "photos";
+const string VK::Parameters::ALBUM_ID = "album_id";
+const string VK::Parameters::PHOTO_IDS = "photo_ids";
+const string VK::Parameters::PHOTO_SIZES = "photo_sizes";
+const string VK::Parameters::REV = "rev";
+const string VK::Parameters::FEED_TYPE = "feed_type";
+const string VK::Parameters::FEED = "feed";
+
 
 // HTTP 
 string VK::Utils::char2hex( char dec ){

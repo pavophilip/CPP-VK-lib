@@ -19,49 +19,6 @@ using namespace std;
 	@author Philip Pavo
 */
 namespace VK{
-
-	/**
-		@brief API class
-	*/
-	class API{
-		public:
-			static string api_url;
-			string access_token;
-			string version;
-			string lang;
-			string https;
-
-			/**
-				API constructor
-
-				@param version Api version
-				@param lang Api language
-				@param https Api requests via https
-				@param access_token Access token for requests
-			*/
-			API(string version, string lang, bool https, string access_token);
-
-			/**
-				HTTP Post request
-
-				@param url request url
-				@param data data string
-				@return json string
-			*/
-			static string post(string url, string data);
-
-			/**
-				HTTP Post request
-
-				@param url method name
-				@param data map of data
-				@return json Json Value Object
-			*/
-			Json::Value call(string method, map<string, string> data);
-		private:
-
-	};
-
 	/**
 		@brief Root class for all VK models
 	*/
@@ -366,14 +323,148 @@ namespace VK{
 			static UserFull parse(Json::Value);
 	};
 
-	
-
 	class Utils{
 		public:
 			static string data2str(map<string, string>);
 			static string urlencode(const string &c);
 			static string char2hex(char);
 			static int CURL_WRITER(char *data, size_t size, size_t nmemb, string *buffer);
+	};
+
+	class Parameters: public map<string, string>{
+	public:
+		//Commons
+	    static const string USER_ID;
+	    static const string USER_IDS;
+	    static const string FIELDS;
+	    static const string SORT;
+	    static const string OFFSET;
+	    static const string COUNT;
+	    static const string OWNER_ID;
+
+	    //auth
+	    static const string VERSION;
+	    static const string HTTPS;
+	    static const string LANG;
+	    static const string ACCESS_TOKEN;
+	    static const string SIG;
+
+	    //get users
+	    static const string NAME_CASE;
+
+	    //Get subscriptions
+	    static const string EXTENDED;
+
+	    //Search
+	    static const string Q;
+	    static const string CITY;
+	    static const string COUNTRY;
+	    static const string HOMETOWN;
+	    static const string UNIVERSITY_COUNTRY;
+	    static const string UNIVERSITY;
+	    static const string UNIVERSITY_YEAR;
+	    static const string SEX;
+	    static const string STATUS;
+	    static const string AGE_FROM;
+	    static const string AGE_TO;
+	    static const string BIRTH_DAY;
+	    static const string BIRTH_MONTH;
+	    static const string BIRTH_YEAR;
+	    static const string ONLINE;
+	    static const string HAS_PHOTO;
+	    static const string SCHOOL_COUNTRY;
+	    static const string SCHOOL_CITY;
+	    static const string SCHOOL;
+	    static const string SCHOOL_YEAR;
+	    static const string RELIGION;
+	    static const string INTERESTS;
+	    static const string COMPANY;
+	    static const string POSITION;
+	    static const string GROUP_ID;
+
+	    static const string FRIENDS_ONLY;
+	    static const string FROM_GROUP;
+	    static const string MESSAGE;
+	    static const string ATTACHMENTS;
+	    static const string SERVICES;
+	    static const string SIGNED;
+	    static const string PUBLISH_DATE;
+	    static const string LAT;
+	    static const string LONG;
+	    static const string PLACE_ID;
+	    static const string POST_ID;
+
+	    //Errors
+	    static const string ERROR_CODE;
+	    static const string ERROR_MSG;
+	    static const string REQUEST_PARAMS;
+
+	    //Captcha
+	    static const string CAPTCHA_IMG;
+	    static const string CAPTCHA_SID;
+	    static const string CAPTCHA_KEY;
+	    static const string REDIRECT_URI;
+
+	    //Photos
+	    static const string PHOTO;
+	    static const string PHOTOS;
+	    static const string ALBUM_ID;
+	    static const string PHOTO_IDS;
+	    static const string PHOTO_SIZES;
+	    static const string REV;
+	    static const string FEED_TYPE;
+	    static const string FEED;
+
+	    Parameters();
+	    //Parameters(map<string, string> data);
+	    string join(string...);
+	};
+
+	/**
+		@brief API class
+	*/
+	class API{
+		public:
+			static string api_url;
+			string access_token;
+			int user_id;
+			string version;
+			string lang;
+			string https;
+
+			/**
+				API constructor
+
+				@param version Api version
+				@param lang Api language
+				@param https Api requests via https
+				@param access_token Access token for requests
+			*/
+			API(string version, string lang, bool https, string access_token);
+
+			/**
+				HTTP Post request
+
+				@param url request url
+				@param data data string
+				@return json string
+			*/
+			static string post(string url, string data);
+
+			/**
+				HTTP Post request
+
+				@param url method name
+				@param data map of data
+				@return json Json Value Object
+			*/
+			Json::Value call(string method, map<string, string> params);
+
+			vector<UserFull> usersGet(map<string, string> params);
+			vector<UserFull> usersSearch(map<string, string> params);
+
+		private:
+
 	};
 }
 #endif

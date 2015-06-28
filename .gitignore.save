@@ -1,0 +1,6 @@
+vkapp
+jsoncpp
+doxygen.conf
+doxygen.conf.bak
+main.cpp
+git rm -r --cached
