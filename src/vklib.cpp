@@ -46,16 +46,30 @@ Json::Value VK::API::call(string method, map<string, string> data){
 	return root;
 }
 
-vector<VK::UserFull> VK::API::usersGet(map<string, string> params){
-	vector<VK::UserFull> users;
+VK::UsersList VK::API::usersGet(map<string, string> params){
 	Json::Value resp = this->call("users.get", params);
-	if(resp["success"].asBool() && resp["response"].isArray()){
-		Json::Value response = resp["response"];
-		for(int i = 0; i < response.size(); i++){
-			users.push_back(VK::UserFull::parse(response[i]));
-		}
+	VK::UsersList *users;
+	if(resp["success"].asBool()){
+		 users = new VK::UsersList(resp["response"]);
 	}
+	return *users;
+}
+
+vector<VK::UserFull> VK::API::usersSearch(map<string, string> params){
+	vector<VK::UserFull> users;
+	Json::Value resp = this->call("users.search", params);
+	if(resp["success"].asBool() && resp["response"]["items"].isArray()){
+		users = VK::UsersList::parse(resp["response"]["items"]);
+	} 
 	return users;
+}
+
+bool VK::API::usersIsAppUser(map<string, string> params){
+	Json::Value resp = this->call("users.isAppUser", params);
+	if(resp["success"].asBool()){
+		return resp["response"] == "1" ? true : false;
+	} 
+	return false;
 }
 
 string VK::API::post(string url, string data){
@@ -93,59 +107,60 @@ VK::User VK::User::parse(Json::Value json){
 }
 
 VK::UserFull VK::UserFull::parse(Json::Value json){
-	VK::UserFull user;
-	user.first_name = json["first_name"].asString();
-	user.last_name = json["last_name"].asString();
-	user.online = json["online"].asBool();
-	user.online_mobile = json["online_mobile"].asBool();
-	user.photo_50 = json["photo_50"].asString();
-	user.photo_100 = json["photo_100"].asString();
-	user.photo_200 = json["photo_200"].asString();
+	VK::UserFull *user = new VK::UserFull();
+	user->first_name = json["first_name"].asString();
+	user->last_name = json["last_name"].asString();
+	user->online = json["online"].asBool();
+	user->online_mobile = json["online_mobile"].asBool();
+	user->photo_50 = json["photo_50"].asString();
+	user->photo_100 = json["photo_100"].asString();
+	user->photo_200 = json["photo_200"].asString();
 
-	user.photo_id = json["photo_id"].asString();
-	user.verified = json["verified"].asBool();
-	user.blacklisted = json["blacklisted"].asBool();
-	user.sex = json["sex"].asInt();
-	user.bdate = json["last_name"].asString();
-	user.city = VK::City::parse(json["city"]);
-	user.country = VK::Country::parse(json["country"]);
-	user.home_town = json["home_town"].asString();
-	user.domain = json["domain"].asString();
-	user.has_mobile = json["has_mobile"].asBool();
-	user.contacts = VK::UserFull::Contacts::parse(json["contacts"]);
-	user.site = json["site"].asString();
-	user.education = VK::Education::parse(json["education"]);
+	user->photo_id = json["photo_id"].asString();
+	user->verified = json["verified"].asBool();
+	user->blacklisted = json["blacklisted"].asBool();
+	user->sex = json["sex"].asInt();
+	user->bdate = json["last_name"].asString();
+	user->city = VK::City::parse(json["city"]);
+	user->country = VK::Country::parse(json["country"]);
+	user->home_town = json["home_town"].asString();
+	user->domain = json["domain"].asString();
+	user->has_mobile = json["has_mobile"].asBool();
+	user->contacts = VK::UserFull::Contacts::parse(json["contacts"]);
+	user->site = json["site"].asString();
+	user->education = VK::Education::parse(json["education"]);
 
 	Json::Value universities = json["universities"];
 	if(universities.isArray()){
 		for(int i = 0; i < universities.size(); i++){
-			user.universities.push_back(VK::University::parse(universities[i]));
+			user->universities.push_back(VK::University::parse(universities[i]));
 		}
 	}
 
 	Json::Value schools = json["schools"];
 	if(schools.isArray()){
 		for(int i = 0; i < schools.size(); i++){
-			user.schools.push_back(VK::School::parse(schools[i]));
+			user->schools.push_back(VK::School::parse(schools[i]));
 		}
 	}
 
-	user.status = json["status"].asString();
-	user.last_seen = VK::UserFull::Seen::parse(json["last_seen"]);
-	user.followers_count = json["followers_count"].asInt();
-	user.common_count = json["common_count"].asInt();
+	user->status = json["status"].asString();
+	user->last_seen = VK::UserFull::Seen::parse(json["last_seen"]);
+	user->followers_count = json["followers_count"].asInt();
+	user->common_count = json["common_count"].asInt();
 
 	Json::Value counters = json["counters"];
 	if(counters.isObject()){
 		for(Json::Value::iterator it = counters.begin(); it !=counters.end(); ++it){
 			Json::Value key = it.key();
 			Json::Value value = (*it);
-			user.counters.insert(std::pair<string, int>(key.asString(), value.asInt()));
+			user->counters.insert(std::pair<string, int>(key.asString(), value.asInt()));
 		}
 	}
 	
-	return user;
+	return *user;
 }
+
 
 VK::City VK::City::parse(Json::Value json){
 	VK::City city;
@@ -216,6 +231,26 @@ VK::UserFull::Seen VK::UserFull::Seen::parse(Json::Value json){
 	seen.time = json["time"].asInt64();
 	seen.platform = json["platform"].asInt();
 	return seen;
+}
+
+VK::UsersList::UsersList(vector<VK::UserFull> users){
+	list = users;
+}	
+VK::UsersList::UsersList(Json::Value json){
+	vector<UserFull> users = parse(json);
+	list = users;	
+}
+vector<VK::UserFull> VK::UsersList::toVector(){
+	return list;
+}
+vector<VK::UserFull> VK::UsersList::parse(Json::Value json){
+		vector<VK::UserFull> users;
+		if(json.isArray()){
+			for(int i = 0; i < json.size(); i++){
+				users.push_back(VK::UserFull::parse(json[i]));
+			}
+		}
+		return users;
 }
 
 // PARAMETERS

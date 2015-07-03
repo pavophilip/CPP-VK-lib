@@ -93,7 +93,7 @@ namespace VK{
 		*/
 		static University parse(Json::Value json);
 	};
-
+	
 	/**
 		A School class describes a school
 	*/
@@ -419,7 +419,23 @@ namespace VK{
 	    //Parameters(map<string, string> data);
 	    string join(string...);
 	};
-
+	
+	class UsersList: public Model{
+	public:
+		vector<UserFull> list;
+		UsersList(vector<VK::UserFull> users);
+		UsersList(Json::Value json);
+		
+		vector<UserFull> toVector();
+		
+		static vector<UserFull> parse(Json::Value json);
+	};
+	
+	class  Response{
+	public:
+		
+	};
+	
 	/**
 		@brief API class
 	*/
@@ -460,9 +476,14 @@ namespace VK{
 			*/
 			Json::Value call(string method, map<string, string> params);
 
-			vector<UserFull> usersGet(map<string, string> params);
+			UsersList usersGet(map<string, string> params);
 			vector<UserFull> usersSearch(map<string, string> params);
-
+			bool usersIsAppUser(map<string, string> params);
+			vector<UserFull> usersGetSubscriptions(map<string, string> params);
+			vector<UserFull> usersGetFollowers(map<string, string> params);
+			vector<UserFull> usersReport(int user_id, string type, map<string, string> params);
+			vector<UserFull> usersGetNearby(double latitude, double longitude, map<string, string> params);
+		
 		private:
 
 	};
